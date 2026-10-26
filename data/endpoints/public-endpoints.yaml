@@ -1,0 +1,24 @@
+# Each top-level block creates an isolated UAP rule binding its principal(s) ONLY to its host(s).
+# Principals in one block do NOT get access to hosts in other blocks.
+
+agent-1-public:
+  description: Allow Agent 1 (or project 755577630695 agents) to egress to unregistered public API endpoints
+  effect: ALLOW
+  principals:
+    - principalSet://agents.global.org-469335481292.system.id.goog/attribute.platformContainer/aiplatform/projects/755577630695
+    # To scope to a single Agent Runtime instead of the project, replace with:
+    # - principal://agents.global.org-469335481292.system.id.goog/resources/aiplatform/projects/755577630695/locations/us-east4/reasoningEngines/<ENGINE_ID>
+  hosts:
+    - api.frankfurter.app
+    - api.frankfurter.dev # api.frankfurter.app now 301-redirects here
+    - httpbin.org
+
+# Example second block: isolated to its own principal and its own public hosts
+# agent-2-public:
+#   description: Allow Agent 2 to egress only to api.weather.com
+#   effect: ALLOW
+#   principals:
+#     - principal://agents.global.org-469335481292.system.id.goog/resources/aiplatform/projects/755577630695/locations/us-east4/reasoningEngines/<ENGINE_2_ID>
+#   hosts:
+#     - api.weather.com
+

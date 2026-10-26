@@ -1,0 +1,25 @@
+project_id                  = "theta-ocean-464621-p0"
+project_number              = "755577630695"
+region                      = "us-east4"
+gateway_name                = "cff-egress-agw"
+psc_i_network_attachment_id = "projects/theta-ocean-464621-p0/regions/us-east4/networkAttachments/agw-attachment"
+
+# Route both public and private endpoints through the Agent Gateway
+access_types = ["PUBLIC", "PRIVATE"]
+
+# Route all traffic (both public and private endpoints) through the VPC network attachment
+vpc_egress = "ALL_TRAFFIC"
+
+# Resolve all DNS queries (".") via the private root zone in consumer-vpc
+dns_peering_config = {
+  domains        = ["."]
+  target_network = "projects/theta-ocean-464621-p0/global/networks/consumer-vpc"
+}
+
+# Unregistered mode: no Agent Registries attached
+registries = null
+
+# Cloud Foundation Fabric factory for allowed endpoints (loads all *.yaml files from ./data/endpoints)
+factories_config = {
+  endpoints = "./data/endpoints"
+}

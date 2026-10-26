@@ -1,0 +1,10 @@
+# Terraform state, cache and real variable values
+.terraform/
+*.tfstate
+*.tfstate.*
+terraform.tfvars
+crash.log
+
+# Python
+__pycache__/
+*.pyc
