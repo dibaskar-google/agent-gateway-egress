@@ -14,14 +14,22 @@
  * limitations under the License.
  */
 
-# tfdoc:file:description Allowed unregistered endpoints factory for Agent Gateway access policies.
+# tfdoc:file:description Factories: allowed endpoints (Agent Gateway access policies) and PSC Interface network attachments.
 
 locals {
+  # Variables available in every factory YAML file as ${name} (rendered with templatefile)
+  factory_vars = {
+    organization_id = var.organization_id
+    project_id      = var.project_id
+    project_number  = var.project_number
+    region          = var.region
+  }
+
   _endpoints_path = try(pathexpand(var.factories_config.endpoints), null)
   _raw_factory_files = {
     for f in try(fileset(local._endpoints_path, "**/*.yaml"), []) :
-    trimsuffix(basename(f), ".yaml") => yamldecode(file(
-      "${local._endpoints_path}/${f}"
+    trimsuffix(basename(f), ".yaml") => yamldecode(templatefile(
+      "${local._endpoints_path}/${f}", local.factory_vars
     ))
   }
 
@@ -90,3 +98,29 @@ locals {
     }
   }
 }
+
+# ---------------------------------------------------------------------------
+# PSC Interface network attachments factory (data/network-attachments/*.yaml)
+# ---------------------------------------------------------------------------
+
+locals {
+  _network_attachments_path = try(pathexpand(var.factories_config.network_attachments), null)
+  _network_attachments_files = {
+    for f in try(fileset(local._network_attachments_path, "**/*.yaml"), []) :
+    f => yamldecode(templatefile("${local._network_attachments_path}/${f}", local.factory_vars))
+  }
+
+  # Each top-level YAML key is one network attachment (key = attachment name)
+  factory_network_attachments = merge([
+    for f, v in local._network_attachments_files : {
+      for name, a in v : name => {
+        subnet_self_link      = a.subnet_self_link
+        automatic_connection  = lookup(a, "automatic_connection", true)
+        description           = lookup(a, "description", null)
+        producer_accept_lists = lookup(a, "producer_accept_lists", null)
+        producer_reject_lists = lookup(a, "producer_reject_lists", null)
+      }
+    } if v != null
+  ]...)
+}
+

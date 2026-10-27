@@ -3,6 +3,11 @@ variable "project_id" {
   type        = string
 }
 
+variable "organization_id" {
+  description = "Numeric ID of the Google Cloud organization. Used in factory YAML files as $${organization_id} (agent identity principals)."
+  type        = string
+}
+
 variable "project_number" {
   description = "Optional project number of var.project_id. Providing this avoids an extra google_project data source lookup when building the connectivity template reference."
   type        = string
@@ -25,8 +30,8 @@ variable "gateway_name" {
   default     = "agent-egress-gw"
 }
 
-variable "psc_i_network_attachment_id" {
-  description = "Full resource ID of the PSC Interface network attachment used by the Agent Gateway connectivity template to reach private VPC endpoints (e.g., projects/<host-project>/regions/<region>/networkAttachments/<name>)."
+variable "gateway_network_attachment" {
+  description = "Name of the network attachment (a key in the network attachments factory) used by the Agent Gateway connectivity template."
   type        = string
 }
 
@@ -58,9 +63,10 @@ variable "registries" {
 }
 
 variable "factories_config" {
-  description = "Paths to data folders that enable Cloud Foundation Fabric factory functionality for allowed endpoints."
+  description = "Paths to data folders that enable Cloud Foundation Fabric factory functionality for allowed endpoints and PSC Interface network attachments."
   type = object({
-    endpoints = optional(string, "./data/endpoints")
+    endpoints           = optional(string, "./data/endpoints")
+    network_attachments = optional(string, "./data/network-attachments")
   })
   nullable = false
   default  = {}

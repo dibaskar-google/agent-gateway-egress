@@ -1,25 +1,29 @@
-project_id                  = "theta-ocean-464621-p0"
-project_number              = "755577630695"
-region                      = "us-east4"
-gateway_name                = "cff-egress-agw"
-psc_i_network_attachment_id = "projects/theta-ocean-464621-p0/regions/us-east4/networkAttachments/agw-attachment"
+# Copy to terraform.tfvars and replace every <PLACEHOLDER> with customer values.
+project_id                 = "<PROJECT_ID>"
+project_number             = "<PROJECT_NUMBER>"
+organization_id            = "<ORGANIZATION_ID>"
+region                     = "us-east4"
+gateway_name               = "cff-egress-agw"
+gateway_network_attachment = "<ATTACHMENT_NAME>" # a key in data/network-attachments/*.yaml
 
 # Route both public and private endpoints through the Agent Gateway
 access_types = ["PUBLIC", "PRIVATE"]
 
-# Route all traffic (both public and private endpoints) through the VPC network attachment
+# Route all traffic through the VPC (needs Cloud NAT on the VPC for public endpoints)
 vpc_egress = "ALL_TRAFFIC"
 
-# Resolve all DNS queries (".") via the private root zone in consumer-vpc
+# Peer all DNS queries (".") to the VPC. The VPC needs a "." forwarding zone (public names)
+# plus private zones for Google APIs / internal domains.
 dns_peering_config = {
   domains        = ["."]
-  target_network = "projects/theta-ocean-464621-p0/global/networks/consumer-vpc"
+  target_network = "projects/<PROJECT_ID>/global/networks/<VPC_NAME>"
 }
 
 # Unregistered mode: no Agent Registries attached
 registries = null
 
-# Cloud Foundation Fabric factory for allowed endpoints (loads all *.yaml files from ./data/endpoints)
+# Cloud Foundation Fabric factories (load all *.yaml files from each folder)
 factories_config = {
-  endpoints = "./data/endpoints"
+  endpoints           = "./data/endpoints"
+  network_attachments = "./data/network-attachments"
 }

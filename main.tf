@@ -4,6 +4,19 @@ locals {
 }
 
 # ---------------------------------------------------------------------------
+# PSC Interface (PSC-I) network attachments (data/network-attachments/*.yaml)
+# ---------------------------------------------------------------------------
+
+module "network_attachments" {
+  # Using local Cloud Foundation Fabric checkout (or switch to GitHub source below):
+  # source = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/net-address?ref=master"
+  source = "/usr/local/google/home/dibaskar/cloud-foundation-fabric/modules/net-address"
+
+  project_id          = var.project_id
+  network_attachments = local.factory_network_attachments
+}
+
+# ---------------------------------------------------------------------------
 # GEAP Agent Gateway (Egress: AGENT_TO_ANYWHERE)
 # Routes both PUBLIC and PRIVATE endpoints via Agent Connectivity Template
 # ---------------------------------------------------------------------------
@@ -21,7 +34,9 @@ module "agent_gateway" {
   registries     = var.registries
 
   networking_config = {
-    psc_i_network_attachment_id = var.psc_i_network_attachment_id
+    # coalesce() tells Terraform the ID is never null, so a fresh deployment can plan
+    # before the attachment exists (otherwise: "Invalid count argument" in the module)
+    psc_i_network_attachment_id = coalesce(module.network_attachments.network_attachment_ids[var.gateway_network_attachment])
     access_types                = var.access_types # ["PUBLIC", "PRIVATE"]
     vpc_egress                  = var.vpc_egress
     dns_peering_config          = var.dns_peering_config

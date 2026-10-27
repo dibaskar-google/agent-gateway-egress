@@ -1,0 +1,20 @@
+# Each top-level key creates one PSC Interface network attachment (key = attachment name).
+# Names must be unique across all files in this folder. Attachments are created in
+# ${project_id}; each attachment's region comes from its subnet.
+# ${organization_id}, ${project_id}, ${project_number} and ${region} come from terraform.tfvars.
+#
+# Attributes:
+#   subnet_self_link      (required) existing subnet the attachment is created on
+#   automatic_connection  (optional) default true (ACCEPT_AUTOMATIC); false = ACCEPT_MANUAL
+#   producer_accept_lists (optional) projects allowed to connect when automatic_connection is false
+#   producer_reject_lists (optional) projects always rejected
+#   description           (optional) default "Terraform-managed."
+#
+# gateway_network_attachment in terraform.tfvars selects the one the Agent Gateway uses.
+
+cff-agw-attachment:
+  subnet_self_link: projects/${project_id}/regions/${region}/subnetworks/agw-attachment-subnet
+
+# Example second attachment:
+# other-attachment:
+#   subnet_self_link: projects/${project_id}/regions/${region}/subnetworks/<SUBNET>

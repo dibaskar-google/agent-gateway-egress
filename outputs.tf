@@ -1,3 +1,8 @@
+output "network_attachment_ids" {
+  description = "IDs of the PSC Interface network attachments created from the factory, keyed by name."
+  value       = module.network_attachments.network_attachment_ids
+}
+
 output "agent_gateway_id" {
   description = "The fully qualified ID of the egress Agent Gateway (pass to geap-agent-runtime networking_config.agent_gateways.egress)."
   value       = module.agent_gateway.id

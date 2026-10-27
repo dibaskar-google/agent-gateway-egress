@@ -1,13 +1,14 @@
 # Each top-level block creates an isolated UAP rule binding its principal(s) ONLY to its host(s).
 # Principals in one block do NOT get access to hosts in other blocks.
+# ${organization_id}, ${project_id}, ${project_number} and ${region} come from terraform.tfvars.
 
 agent-1-public:
-  description: Allow Agent 1 (or project 755577630695 agents) to egress to unregistered public API endpoints
+  description: Allow Agent 1 (or project ${project_number} agents) to egress to unregistered public API endpoints
   effect: ALLOW
   principals:
-    - principalSet://agents.global.org-469335481292.system.id.goog/attribute.platformContainer/aiplatform/projects/755577630695
+    - principalSet://agents.global.org-${organization_id}.system.id.goog/attribute.platformContainer/aiplatform/projects/${project_number}
     # To scope to a single Agent Runtime instead of the project, replace with:
-    # - principal://agents.global.org-469335481292.system.id.goog/resources/aiplatform/projects/755577630695/locations/us-east4/reasoningEngines/<ENGINE_ID>
+    # - principal://agents.global.org-${organization_id}.system.id.goog/resources/aiplatform/projects/${project_number}/locations/${region}/reasoningEngines/<ENGINE_ID>
   hosts:
     - api.frankfurter.app
     - api.frankfurter.dev # api.frankfurter.app now 301-redirects here
@@ -18,7 +19,6 @@ agent-1-public:
 #   description: Allow Agent 2 to egress only to api.weather.com
 #   effect: ALLOW
 #   principals:
-#     - principal://agents.global.org-469335481292.system.id.goog/resources/aiplatform/projects/755577630695/locations/us-east4/reasoningEngines/<ENGINE_2_ID>
+#     - principal://agents.global.org-${organization_id}.system.id.goog/resources/aiplatform/projects/${project_number}/locations/${region}/reasoningEngines/<ENGINE_2_ID>
 #   hosts:
 #     - api.weather.com
-
